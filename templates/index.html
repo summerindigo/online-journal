@@ -54,6 +54,11 @@
             margin-bottom: 20px;
         }
 
+        .posting-box > .date-box {
+            margin-bottom: 20px;
+
+        }
+
 
     </style>
 
@@ -74,12 +79,15 @@
                     for (let i = 0; i < diaries.length; i++) {
                         let title = diaries[i]['title']
                         let content = diaries[i]['content']
+                        let file = diaries[i]['file']
+                        let date = diaries[i]['date']
 
                         let temp_html = `<div class="card">
-                                            <img class="card-img-top" src="../static/monet.jpg" alt="Card image cap">
+                                            <img class="card-img-top" src="../static/${file}" alt="Card image cap">
                                             <div class="card-body">
                                                 <h5 class="card-title">${title}</h5>
                                                 <p class="card-text">${content}</p>
+                                                <p class="card-date">${date}</p>
                                             </div>
                                         </div>`
                         $('#cards-box').append(temp_html)
@@ -90,18 +98,29 @@
 
         function posting() {
             let title = $('#title').val()
-            let content = $('#content').val()
+            let content = $("#content").val()
+
+            let file = $('#file')[0].files[0]
+            let form_data = new FormData()
+
+            form_data.append("file_give", file)
+            form_data.append("title_give", title)
+            form_data.append("content_give", content)
 
             $.ajax({
                 type: "POST",
                 url: "/diary",
-                data: {title_give: title, content_give: content},
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
                 success: function (response) {
-                    alert(response['msg'])
+                    alert(response["msg"])
                     window.location.reload()
                 }
-            })
+            });
         }
+
 
     </script>
 
@@ -114,8 +133,8 @@
             <h1>나홀로 일기장</h1>
             <div class="posting-box">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFile">
-                    <label class="custom-file-label" for="customFile">사진 선택</label>
+                    <input type="file" class="custom-file-input" id="file">
+                    <label class="custom-file-label" for="file">사진 선택</label>
                 </div>
                 <div class="form-group">
                     <input type="email" class="form-control" id="title" placeholder="사진 제목">
@@ -124,6 +143,9 @@
                 <div class="form-group">
                     <textarea class="form-control" id="content" rows="3"
                               placeholder="내용 입력"></textarea>
+                </div>
+                <div class="date-box">
+                    <input type="date" class="form-control" id="date">
                 </div>
             </div>
             <button onclick="posting()" type="button" class="btn btn-primary">저장하기</button>
